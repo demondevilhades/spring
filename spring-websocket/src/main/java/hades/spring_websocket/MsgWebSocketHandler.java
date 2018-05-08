@@ -3,7 +3,9 @@ package hades.spring_websocket;
 import hades.spring_websocket.bean.WSMsg;
 
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 import net.sf.json.JSONObject;
 
@@ -19,18 +21,18 @@ public class MsgWebSocketHandler extends TextWebSocketHandler {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    private ArrayList<WebSocketSession> sessionList = new ArrayList<WebSocketSession>();
+    private final Set<WebSocketSession> sessionSet = Collections.synchronizedSet(new HashSet<WebSocketSession>());
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
         logger.info("ConnectionEstablished : " + session.getLocalAddress().getHostName());
-        sessionList.add(session);
+        sessionSet.add(session);
     }
 
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
         logger.info("ConnectionClosed : " + session.getLocalAddress().getHostName());
-        sessionList.remove(session);
+        sessionSet.remove(session);
     }
 
     @Override
@@ -41,7 +43,7 @@ public class MsgWebSocketHandler extends TextWebSocketHandler {
             logger.info("TransportError : " + session.getLocalAddress().getHostName(), t);
         }
         if (!session.isOpen()) {
-            sessionList.remove(session);
+            sessionSet.remove(session);
         }
     }
 
@@ -59,7 +61,7 @@ public class MsgWebSocketHandler extends TextWebSocketHandler {
                     wsMsg.setFrom(session.getLocalAddress().getHostName());
                 }
                 String resMsg = JSONObject.fromObject(wsMsg).toString();
-                for (WebSocketSession webSocketSession : sessionList) {
+                for (WebSocketSession webSocketSession : sessionSet) {
                     webSocketSession.sendMessage(new TextMessage(resMsg));
                 }
             } else {
