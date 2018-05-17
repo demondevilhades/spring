@@ -59,8 +59,7 @@ public class WebTask {
         logger.info("runTask:" + alive);
         if (alive) {
             try {
-                HttpUtils.httpGet(webTaskConfig.getUrl(), webTaskConfig.getUserAgent(), webTaskConfig.getCookie(),
-                        webTaskConfig.isLogEntity());
+                HttpUtils.httpRequest(webTaskConfig);
             } catch (Exception e) {
                 logger.error("", e);
             }

@@ -1,11 +1,18 @@
 package hades.webtask.util;
 
+import hades.webtask.bean.WebTaskConfig;
+
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpHost;
+import org.apache.http.NameValuePair;
 import org.apache.http.StatusLine;
 import org.apache.http.client.CookieStore;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
@@ -14,16 +21,29 @@ import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.cookie.BasicClientCookie;
+import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.bind.annotation.RequestMethod;
 
 public class HttpUtils {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(HttpUtils.class);
 
-    public static void httpGet(String url, String userAgent, Map<String, String> cookieMap, boolean logEntity)
-            throws IOException {
+    public static void httpRequest(WebTaskConfig webTaskConfig) throws IOException {
+        if (RequestMethod.POST.name().equalsIgnoreCase(webTaskConfig.getRequestMethod())) {
+            httpPost(webTaskConfig.getUrl(), webTaskConfig.getUserAgent(), webTaskConfig.getCookie(),
+                    webTaskConfig.getHeaders(), webTaskConfig.getParams(), webTaskConfig.getParamCharset(),
+                    webTaskConfig.isLogEntity());
+        } else {
+            httpGet(webTaskConfig.getUrl(), webTaskConfig.getUserAgent(), webTaskConfig.getCookie(),
+                    webTaskConfig.getHeaders(), webTaskConfig.isLogEntity());
+        }
+    }
+
+    public static void httpGet(String url, String userAgent, Map<String, String> cookieMap,
+            Map<String, String> headers, boolean logEntity) throws IOException {
         HttpGet httpGet = new HttpGet(url);
 
         CookieStore cookieStore = new BasicCookieStore();
@@ -32,6 +52,11 @@ public class HttpUtils {
                 BasicClientCookie cookie = new BasicClientCookie(entry.getKey(), entry.getValue());
                 cookie.setDomain(httpGet.getURI().getHost());
                 cookieStore.addCookie(cookie);
+            }
+        }
+        if (headers != null) {
+            for (Map.Entry<String, String> entry : headers.entrySet()) {
+                httpGet.addHeader(entry.getKey(), entry.getValue());
             }
         }
 
@@ -68,7 +93,8 @@ public class HttpUtils {
         }
     }
 
-    public static void httpPost(String url, String userAgent, Map<String, String> cookieMap, boolean logEntity)
+    public static void httpPost(String url, String userAgent, Map<String, String> cookieMap,
+            Map<String, String> headers, Map<String, String> params, String paramCharset, boolean logEntity)
             throws IOException {
         HttpPost httpPost = new HttpPost(url);
 
@@ -79,6 +105,19 @@ public class HttpUtils {
                 cookie.setDomain(httpPost.getURI().getHost());
                 cookieStore.addCookie(cookie);
             }
+        }
+        if (headers != null) {
+            for (Map.Entry<String, String> entry : headers.entrySet()) {
+                httpPost.addHeader(entry.getKey(), entry.getValue());
+            }
+        }
+        if (params != null) {
+            List<NameValuePair> parameters = new ArrayList<NameValuePair>();
+            for (Map.Entry<String, String> entry : params.entrySet()) {
+                parameters.add(new BasicNameValuePair(entry.getKey(), entry.getValue()));
+            }
+            String charset = StringUtils.isEmpty(paramCharset) ? "utf-8" : paramCharset;
+            httpPost.setEntity(new UrlEncodedFormEntity(parameters, charset));
         }
 
         HttpHost proxyHttpHost = getProxyHttpHost(httpPost);

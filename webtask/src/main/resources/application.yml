@@ -16,6 +16,7 @@ webtask:
     cron_exp: 0/15 * * * * ?
     config:
       url: https://www.oschina.net/question?catalog=1&show=time
+      requestMethod: GET
       userAgent: Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.76 Safari/537.36
       logEntity: false
       cookie[__DAYU_PP]: aaa
