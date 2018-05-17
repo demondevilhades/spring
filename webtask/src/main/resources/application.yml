@@ -1,0 +1,34 @@
+
+server:
+  port: 8083
+management:  
+  port: 18083
+spring:
+  application:
+    name: webtask
+
+webtask:
+  httpProxyHost: proxy.***.com.cn
+  httpProxyPort: 80
+  httpsProxyHost: proxy.***.com.cn
+  httpsProxyPort: 80
+  task0:
+    cron_exp: 0/15 * * * * ?
+    config:
+      url: https://www.oschina.net/question?catalog=1&show=time
+      userAgent: Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.76 Safari/537.36
+      logEntity: false
+      cookie[__DAYU_PP]: aaa
+      cookie[_user_behavior_]: bbb
+      cookie[Hm_lvt_a411c4d1664dd70048ee98afe7b28f0b]: ccc
+      cookie[aliyungf_tc]: ddd
+      cookie[oscid]: eee
+      cookie[visit-gitee-stars-bts-09-180509]: fff
+
+logging:
+  file: ./logs/webtask.log
+
+endpoints:
+  shutdown:
+    enabled: true
+    sensitive: false
