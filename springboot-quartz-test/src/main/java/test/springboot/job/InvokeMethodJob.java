@@ -44,8 +44,14 @@ public class InvokeMethodJob implements Job {
                             MethodHandleUtils.invockMethod(clazz, invokeMethodJobData.getMethodName(), String.class,
                                     void.class, instance, invokeMethodJobData.getArg());
                         }
+                    } else {
+                        log.error("instance is null");
                     }
+                } else {
+                    log.error("class is null");
                 }
+            } else {
+                log.error("className is empty");
             }
         } catch (JsonSyntaxException e) {
             log.error("", e);
@@ -53,13 +59,6 @@ public class InvokeMethodJob implements Job {
             log.error("", e);
         } catch (Throwable e) {
             log.error("", e);
-        }
-    }
-
-    @Slf4j
-    public static class TestInvokeMethod {
-        public void test() {
-            log.info("TestInvokeMethod.test");
         }
     }
 }
