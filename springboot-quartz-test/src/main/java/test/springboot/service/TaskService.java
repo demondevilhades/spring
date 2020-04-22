@@ -29,7 +29,7 @@ import test.springboot.util.TaskUtils;
 
 @Slf4j
 @Service
-public class QuartzService {
+public class TaskService {
 
     @Resource
     public SchedulerFactoryBean schedulerFactoryBean;
@@ -51,7 +51,7 @@ public class QuartzService {
     }
 
     public void addJob(TaskConfig taskConfig) throws SchedulerException, ClassNotFoundException {
-        TriggerKey triggerKey = TriggerKey.triggerKey(taskConfig.getTriggerName(), taskConfig.getJobGroup());
+        TriggerKey triggerKey = TriggerKey.triggerKey(taskConfig.getTriggerName(), taskConfig.getTriggerGroup());
 
         CronTrigger trigger = (CronTrigger) scheduler.getTrigger(triggerKey);
 
@@ -86,17 +86,20 @@ public class QuartzService {
 
                 List<? extends Trigger> triggerList = scheduler.getTriggersOfJob(jobKey);
                 for (Trigger trigger : triggerList) {
+                    TriggerKey triggerKey = trigger.getKey();
                     TaskConfig taskConfig = new TaskConfig();
                     taskConfig.setBeanClass(jobDetail.getJobClass().toString());
                     taskConfig.setDescription(jobDetail.getDescription());
                     taskConfig.setJobData(jobDetail.getJobDataMap().getString(TaskUtils.JOB_DATA_KEY));
                     taskConfig.setJobGroup(jobKey.getGroup());
                     taskConfig.setJobName(jobKey.getName());
-                    taskConfig.setTriggerName(trigger.getKey().getName());
+                    taskConfig.setTriggerName(triggerKey.getName());
+                    taskConfig.setTriggerGroup(triggerKey.getGroup());
                     if (trigger instanceof CronTrigger) {
                         CronTrigger cronTrigger = (CronTrigger) trigger;
                         taskConfig.setCronExpression(cronTrigger.getCronExpression());
                     }
+                    taskConfig.setStatus(TaskConfig.Status.NORMAL);
                     taskConfigList.add(taskConfig);
                 }
             }

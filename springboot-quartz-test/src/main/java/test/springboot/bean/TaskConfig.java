@@ -21,6 +21,8 @@ public class TaskConfig implements Serializable {
 
     private String jobGroup;
 
+    private String triggerGroup;
+
     private String jobData;
 
     private String cronExpression;
