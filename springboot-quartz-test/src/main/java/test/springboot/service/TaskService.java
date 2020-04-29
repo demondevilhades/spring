@@ -52,10 +52,7 @@ public class TaskService {
 
     public void addJob(TaskConfig taskConfig) throws SchedulerException, ClassNotFoundException {
         TriggerKey triggerKey = TriggerKey.triggerKey(taskConfig.getTriggerName(), taskConfig.getTriggerGroup());
-
         CronTrigger trigger = (CronTrigger) scheduler.getTrigger(triggerKey);
-
-        CronScheduleBuilder scheduleBuilder = CronScheduleBuilder.cronSchedule(taskConfig.getCronExpression());
         if (trigger == null) {
             @SuppressWarnings("unchecked")
             Class<? extends Job> jobClass = (Class<? extends Job>) Class.forName(taskConfig.getBeanClass());
@@ -63,18 +60,32 @@ public class TaskService {
                     .withIdentity(taskConfig.getJobName(), taskConfig.getJobGroup())
                     .usingJobData(TaskUtils.JOB_DATA_KEY, taskConfig.getJobData()).build();
 
-            trigger = TriggerBuilder.newTrigger().withIdentity(triggerKey).withDescription(taskConfig.getDescription())
-                    .withSchedule(scheduleBuilder).usingJobData(TaskUtils.JOB_DATA_KEY, taskConfig.getJobData())
-                    .build();
-
-            scheduler.scheduleJob(jobDetail, trigger);
+            scheduler.scheduleJob(jobDetail, buildTrigger(trigger, taskConfig, triggerKey));
         } else {
-            trigger = trigger.getTriggerBuilder().withIdentity(triggerKey).withDescription(taskConfig.getDescription())
-                    .withSchedule(scheduleBuilder).usingJobData(TaskUtils.JOB_DATA_KEY, taskConfig.getJobData())
-                    .build();
-
-            scheduler.rescheduleJob(triggerKey, trigger);
+            scheduler.rescheduleJob(triggerKey, buildTrigger(trigger, taskConfig, triggerKey));
         }
+    }
+
+    private CronTrigger buildTrigger(CronTrigger trigger, TaskConfig taskConfig, TriggerKey triggerKey) {
+        CronScheduleBuilder scheduleBuilder = CronScheduleBuilder.cronSchedule(taskConfig.getCronExpression());
+        TriggerBuilder<CronTrigger> triggerBuilder = trigger == null
+                ? TriggerBuilder.newTrigger().withSchedule(scheduleBuilder)
+                : trigger.getTriggerBuilder().withSchedule(scheduleBuilder);
+        triggerBuilder.withIdentity(triggerKey).withDescription(taskConfig.getDescription())
+                .usingJobData(TaskUtils.JOB_DATA_KEY, taskConfig.getJobData());
+        if (taskConfig.getStartTime() != null) {
+            triggerBuilder.startAt(taskConfig.getStartTime());
+        }
+        if (taskConfig.getEndTime() != null) {
+            triggerBuilder.endAt(taskConfig.getEndTime());
+        }
+        if (taskConfig.getStartNow() != null && taskConfig.getStartNow() != 0) {
+            triggerBuilder.startNow();
+        }
+        if (taskConfig.getPriority() != null && taskConfig.getPriority() != 0) {
+            triggerBuilder.withPriority(taskConfig.getPriority());
+        }
+        return triggerBuilder.build();
     }
 
     public List<TaskConfig> getJobInfoList() {
@@ -98,6 +109,9 @@ public class TaskService {
                     if (trigger instanceof CronTrigger) {
                         CronTrigger cronTrigger = (CronTrigger) trigger;
                         taskConfig.setCronExpression(cronTrigger.getCronExpression());
+                        taskConfig.setStartTime(cronTrigger.getStartTime());
+                        taskConfig.setEndTime(cronTrigger.getEndTime());
+                        taskConfig.setPriority(cronTrigger.getPriority());
                     }
                     taskConfig.setStatus(TaskConfig.Status.NORMAL);
                     taskConfigList.add(taskConfig);

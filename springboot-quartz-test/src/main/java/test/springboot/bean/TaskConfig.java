@@ -29,9 +29,17 @@ public class TaskConfig implements Serializable {
 
     private String description;
 
+    private Date startTime;
+
+    private Date endTime;
+
+    private Integer startNow;
+    
+    private Integer priority;
+
     private String beanClass;
 
-    private int status;
+    private Integer status;
 
     private Date createtime;
 
