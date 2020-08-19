@@ -21,6 +21,7 @@ import org.quartz.TriggerKey;
 import org.quartz.impl.matchers.GroupMatcher;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import lombok.extern.slf4j.Slf4j;
 import test.springboot.bean.TaskConfig;
@@ -41,7 +42,9 @@ public class TaskService {
 
     @PostConstruct
     public void init() throws SchedulerException, ClassNotFoundException {
-        scheduler = schedulerFactoryBean.getScheduler();
+        if (scheduler == null) {
+            scheduler = schedulerFactoryBean.getScheduler();
+        }
 
         List<TaskConfig> taskConfigList = taskConfigDao.getAllTaskConfig();
         for (TaskConfig taskConfig : taskConfigList) {
@@ -68,6 +71,20 @@ public class TaskService {
 
     private CronTrigger buildTrigger(CronTrigger trigger, TaskConfig taskConfig, TriggerKey triggerKey) {
         CronScheduleBuilder scheduleBuilder = CronScheduleBuilder.cronSchedule(taskConfig.getCronExpression());
+        switch (taskConfig.getMisfireHandlingInstruction()) {
+        case CronTrigger.MISFIRE_INSTRUCTION_DO_NOTHING:
+            scheduleBuilder.withMisfireHandlingInstructionDoNothing();
+            break;
+        case CronTrigger.MISFIRE_INSTRUCTION_FIRE_ONCE_NOW:
+            scheduleBuilder.withMisfireHandlingInstructionFireAndProceed();
+            break;
+        case CronTrigger.MISFIRE_INSTRUCTION_IGNORE_MISFIRE_POLICY:
+            scheduleBuilder.withMisfireHandlingInstructionIgnoreMisfires();
+            break;
+        case CronTrigger.MISFIRE_INSTRUCTION_SMART_POLICY:
+            break;
+        default:
+        }
         TriggerBuilder<CronTrigger> triggerBuilder = trigger == null
                 ? TriggerBuilder.newTrigger().withSchedule(scheduleBuilder)
                 : trigger.getTriggerBuilder().withSchedule(scheduleBuilder);
@@ -112,6 +129,10 @@ public class TaskService {
                         taskConfig.setStartTime(cronTrigger.getStartTime());
                         taskConfig.setEndTime(cronTrigger.getEndTime());
                         taskConfig.setPriority(cronTrigger.getPriority());
+
+//                        cronTrigger.getFinalFireTime();
+//                        cronTrigger.getPreviousFireTime();
+//                        cronTrigger.getNextFireTime();
                     }
                     taskConfig.setStatus(TaskConfig.Status.NORMAL);
                     taskConfigList.add(taskConfig);
@@ -121,5 +142,59 @@ public class TaskService {
             log.error("", e);
         }
         return taskConfigList;
+    }
+
+    /**
+     * @throws SchedulerException
+     * @throws ClassNotFoundException
+     * 
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public void flushQuartz() throws ClassNotFoundException, SchedulerException {
+        scheduler.standby();
+        scheduler.clear();
+        init();
+        scheduler.start();
+    }
+
+    /**
+     * 
+     * @throws SchedulerException
+     */
+    public void pauseAll() throws SchedulerException {
+        scheduler.pauseAll();
+    }
+
+    /**
+     * 
+     * @throws SchedulerException
+     */
+    public void resumeAll() throws SchedulerException {
+        scheduler.resumeAll();
+    }
+
+    /**
+     * 
+     * @throws SchedulerException
+     */
+    public void standby() throws SchedulerException {
+        scheduler.standby();
+    }
+
+    /**
+     * 
+     * @throws SchedulerException
+     */
+    public void start() throws SchedulerException {
+        scheduler.start();
+    }
+
+    /**
+     * 
+     * @param waitForJobsToComplete
+     * @throws SchedulerException
+     */
+    public void shutdown(boolean waitForJobsToComplete) throws SchedulerException {
+        scheduler.shutdown(waitForJobsToComplete);
     }
 }

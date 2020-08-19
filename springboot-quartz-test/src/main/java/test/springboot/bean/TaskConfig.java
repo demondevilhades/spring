@@ -37,6 +37,8 @@ public class TaskConfig implements Serializable {
     
     private Integer priority;
 
+    private Integer misfireHandlingInstruction;
+
     private String beanClass;
 
     private Integer status;

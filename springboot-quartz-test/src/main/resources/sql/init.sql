@@ -13,6 +13,7 @@ CREATE TABLE `task_config`  (
   `end_time` datetime(0) DEFAULT NULL,
   `start_now` tinyint(1) UNSIGNED NOT NULL DEFAULT 0,
   `priority` tinyint(1) UNSIGNED NOT NULL DEFAULT 0,
+  `misfire_handling_instruction` tinyint(1) UNSIGNED NOT NULL DEFAULT 0,
   `bean_class` varchar(255) NOT NULL,
   `status` int(11) NOT NULL,
   `createtime` datetime(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0) COMMENT 'auto insert',
