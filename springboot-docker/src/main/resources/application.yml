@@ -1,0 +1,8 @@
+logging:
+  config: classpath:logback.xml
+  level:
+    test: debug
+spring:
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: Asia/Hong_Kong
