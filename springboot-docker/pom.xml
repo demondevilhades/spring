@@ -53,6 +53,9 @@
 		<sourceDirectory>src/main/java</sourceDirectory>
 		<resources>
 			<resource>
+				<directory>src/main/resources</directory>
+			</resource>
+			<resource>
 				<directory>src/main/docker</directory>
 				<filtering>true</filtering>
 				<excludes>
@@ -87,6 +90,14 @@
 					</imageTags>
 					
 					<baseImage>openjdk:8-jdk</baseImage>
+					<!-- <runs></runs> -->
+					<!-- <env></env> -->
+					<exposes>
+						<expose>8080</expose>
+					</exposes>
+					<volumes>
+						<volume>/data/logs</volume>
+					</volumes>
 					<entryPoint>["java", "-jar", "/${project.build.finalName}.jar"]</entryPoint>
 					
 					<!-- <dockerDirectory>${project.basedir}/src/main/docker</dockerDirectory> -->
