@@ -4,6 +4,13 @@
     <contextName>logback</contextName>
     <property name="log.path" value="/data/logs" />
     <property name="log_pattern" value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50} - %msg%n" />
+    
+    <property name="app_name" value="test" />
+    <property name="c_name" value="_${net.hostName:-}" />
+    <property name="debug_log_name" value="${app_name}_debug${c_name}" />
+    <property name="info_log_name" value="${app_name}_info${c_name}" />
+    <property name="warn_log_name" value="${app_name}_warn${c_name}" />
+    <property name="error_log_name" value="${app_name}_error${c_name}" />
 
     <!-- 彩色日志 -->
     <!-- 彩色日志依赖的渲染类 -->
@@ -12,7 +19,6 @@
     <conversionRule conversionWord="wEx" converterClass="org.springframework.boot.logging.logback.ExtendedWhitespaceThrowableProxyConverter" />
     <!-- 彩色日志格式 -->
     <property name="CONSOLE_LOG_PATTERN" value="${CONSOLE_LOG_PATTERN:-%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(${LOG_LEVEL_PATTERN:-%5p}) %clr(${PID:- }){magenta} %clr(---){faint} %clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}}"/>
-
 
     <!--输出到控制台-->
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
@@ -27,15 +33,14 @@
 
 
     <!--输出到文件-->
-<!-- 
     <appender name="DEBUG_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>${log.path}/test_debug.log</file>
+        <file>${log.path}/${debug_log_name}.log</file>
         <encoder>
             <pattern>${log_pattern}</pattern>
             <charset>UTF-8</charset>
         </encoder>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>${log.path}/debug/test_debug-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <fileNamePattern>${log.path}/debug/${debug_log_name}-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
             <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
                 <maxFileSize>100MB</maxFileSize>
             </timeBasedFileNamingAndTriggeringPolicy>
@@ -49,13 +54,13 @@
     </appender>
 
     <appender name="INFO_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>${log.path}/test_info.log</file>
+        <file>${log.path}/${info_log_name}.log</file>
         <encoder>
             <pattern>${log_pattern}</pattern>
             <charset>UTF-8</charset>
         </encoder>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>${log.path}/info/test_info-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <fileNamePattern>${log.path}/info/${info_log_name}-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
             <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
                 <maxFileSize>100MB</maxFileSize>
             </timeBasedFileNamingAndTriggeringPolicy>
@@ -69,13 +74,13 @@
     </appender>
 
     <appender name="WARN_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>${log.path}/test_warn.log</file>
+        <file>${log.path}/${warn_log_name}.log</file>
         <encoder>
             <pattern>${log_pattern}</pattern>
             <charset>UTF-8</charset>
         </encoder>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>${log.path}/warn/test_warn-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <fileNamePattern>${log.path}/warn/${warn_log_name}-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
             <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
                 <maxFileSize>100MB</maxFileSize>
             </timeBasedFileNamingAndTriggeringPolicy>
@@ -89,13 +94,13 @@
     </appender>
 
     <appender name="ERROR_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>${log.path}/test_error.log</file>
+        <file>${log.path}/${error_log_name}.log</file>
         <encoder>
             <pattern>${log_pattern}</pattern>
             <charset>UTF-8</charset>
         </encoder>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>${log.path}/error/test_error-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <fileNamePattern>${log.path}/error/${error_log_name}-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
             <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
                 <maxFileSize>100MB</maxFileSize>
             </timeBasedFileNamingAndTriggeringPolicy>
@@ -107,12 +112,12 @@
             <onMismatch>DENY</onMismatch>
         </filter>
     </appender>
- -->
+    
     <root level="INFO">
         <appender-ref ref="CONSOLE" />
-<!--         <appender-ref ref="DEBUG_FILE" />
+        <appender-ref ref="DEBUG_FILE" />
         <appender-ref ref="INFO_FILE" />
         <appender-ref ref="WARN_FILE" />
-        <appender-ref ref="ERROR_FILE" /> -->
+        <appender-ref ref="ERROR_FILE" />
     </root>
 </configuration>
