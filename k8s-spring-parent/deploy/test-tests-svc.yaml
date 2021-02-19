@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    app: test-tests
+  name: test-tests
+  namespace: test
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 80
+    nodePort: 31101
+  selector:
+    app: test-tests
+  type: NodePort
+status:
+  loadBalancer: {}

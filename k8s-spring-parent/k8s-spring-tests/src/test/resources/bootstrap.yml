@@ -1,0 +1,43 @@
+server:
+  port: 18002
+  servlet:
+    context-path: /
+
+spring:
+  application:
+    name: tests-service
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: Asia/Hong_Kong
+  cloud:
+    bootstrap:
+      enabled: true
+    config:
+      name: tests,redisson
+      uri: http://localhost:18001/
+      profile: dev
+      fail-fast: true
+
+feign:
+  httpclient:
+    enabled: true
+  client:
+    config:
+      default:
+        read-timeout: 30000
+        connect-timeout: 30000
+
+management:
+  health:
+    rabbit:
+      enabled: false
+    probes:
+      enabled: true
+  endpoint:
+    health:
+      enabled: true
+      show-details: always
+    restart: 
+      enabled: true
+    info:
+      enabled: true

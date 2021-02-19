@@ -1,0 +1,36 @@
+server:
+  port: 80
+  servlet:
+    context-path: /
+
+spring:
+  application:
+    name: config-service
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: Asia/Hong_Kong
+  profiles:
+    active: native
+  cloud:
+    kubernetes:
+      discovery:
+        enabled: true
+    config:
+      server:
+        native:
+          search-locations: classpath:/config/
+
+management:
+  health:
+    rabbit:
+      enabled: false
+    probes:
+      enabled: true
+  endpoint:
+    health:
+      enabled: true
+      show-details: always
+    restart: 
+      enabled: true
+    info:
+      enabled: true

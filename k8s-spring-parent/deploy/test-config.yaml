@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: test-config
+  name: test-config
+  namespace: test
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: test-config
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        app: test-config
+    spec:
+      volumes:
+      - name: date-config
+        hostPath:
+          path: /etc/localtime
+      containers:
+      - image: docker-host:5000/test/config:1.0.0
+        name: test-config
+        resources: {}
+        imagePullPolicy: Always
+        volumeMounts:
+        - name: date-config
+          mountPath: /etc/localtime
+        readinessProbe:
+          httpGet:
+            port: 80
+            path: /actuator/health/readiness
+        livenessProbe:
+          httpGet:
+            port: 80
+            path: /actuator/health/liveness
+      serviceAccountName: admin
+      serviceAccount: admin
+      hostAliases:
+      - ip: <mysql-host>
+        hostnames:
+        - "mysql-host"
+      - ip: <redis-host>
+        hostnames:
+        - "redis-host"
+      - ip: <kafka-host>
+        hostnames:
+        - "kafka-host"
+status: {}

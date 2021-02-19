@@ -1,0 +1,26 @@
+singleServerConfig:
+  address: "redis://localhost:12331"
+  password: well@dmp1
+  clientName: null
+  database: 0
+  idleConnectionTimeout: 10000
+  pingTimeout: 1000
+  connectTimeout: 10000
+  timeout: 3000
+  retryAttempts: 3
+  retryInterval: 1500
+  reconnectionTimeout: 3000
+  failedAttempts: 3
+  subscriptionsPerConnection: 5
+  subscriptionConnectionMinimumIdleSize: 1
+  subscriptionConnectionPoolSize: 10
+  connectionMinimumIdleSize: 2
+  connectionPoolSize: 16
+  dnsMonitoringInterval: 5000
+  #dnsMonitoring: false
+
+threads: 0
+nettyThreads: 0
+codec:
+  class: "org.redisson.codec.JsonJacksonCodec"
+transportMode: "NIO"
