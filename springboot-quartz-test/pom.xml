@@ -17,7 +17,7 @@
 		<java.version>1.8</java.version>
 		<swagger.version>2.9.2</swagger.version>
 		<unit.test.skip>true</unit.test.skip>
-		<mysql.version>8.0.20</mysql.version>
+		<mysql.version>8.0.28</mysql.version>
 		<maven-jar-plugin.version>3.1.1</maven-jar-plugin.version>
 	</properties>
 
